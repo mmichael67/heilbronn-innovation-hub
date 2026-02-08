@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
-import { Factory, Menu, X } from 'lucide-react';
+import { Factory, Menu, X, Presentation } from 'lucide-react';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -74,7 +75,7 @@ export function Header({ activeTab, onTabChange }: HeaderProps) {
           ))}
         </nav>
 
-        {/* Right Side - Language + IHK Badge */}
+        {/* Right Side - Language + Presentation + IHK Badge */}
         <motion.div 
           className="hidden sm:flex items-center gap-3"
           initial={{ opacity: 0, x: 20 }}
@@ -82,6 +83,13 @@ export function Header({ activeTab, onTabChange }: HeaderProps) {
           transition={{ duration: 0.5 }}
         >
           <LanguageSwitcher />
+          <Link 
+            to="/presentation"
+            className="flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-muted-foreground hover:bg-muted/80 hover:text-foreground transition-colors"
+          >
+            <Presentation className="h-3.5 w-3.5" />
+            <span className="text-xs font-medium">Präsentation</span>
+          </Link>
           <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-primary">
             <Factory className="h-3.5 w-3.5" />
             <span className="text-xs font-medium">IHK Heilbronn 2026</span>
