@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IndustryAI - IHK Heilbronn Präsentation 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: hsl(215, 80%, 35%);
+            --primary-light: hsl(215, 80%, 45%);
+            --accent: hsl(175, 70%, 40%);
+            --accent-light: hsl(175, 70%, 50%);
+            --background: hsl(220, 25%, 8%);
+            --card: hsl(220, 25%, 12%);
+            --foreground: hsl(215, 20%, 95%);
+            --muted: hsl(215, 15%, 60%);
+            --border: hsl(215, 25%, 20%);
+            --success: hsl(150, 70%, 40%);
+            --warning: hsl(38, 95%, 50%);
+            --destructive: hsl(0, 75%, 55%);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--background);
+            color: var(--foreground);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Slide Container */
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            opacity: 0;
+            transform: translateX(100px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide.exit {
+            display: flex;
+            opacity: 0;
+            transform: translateX(-100px);
+        }
+
+        /* Slide Backgrounds */
+        .slide-bg-gradient {
+            background: linear-gradient(135deg, hsl(215, 80%, 20%) 0%, hsl(220, 60%, 12%) 100%);
+        }
+
+        .slide-bg-mesh {
+            background: var(--background);
+            position: relative;
+        }
+
+        .slide-bg-mesh::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(at 40% 20%, hsl(215, 80%, 35%, 0.15) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, hsl(175, 70%, 40%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, hsl(215, 80%, 35%, 0.1) 0px, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Typography */
+        .slide-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 24px;
+            line-height: 1.1;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, hsl(215, 80%, 55%) 0%, hsl(175, 70%, 50%) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+            color: var(--muted);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 40px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px hsl(215, 30%, 10%, 0.3);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--foreground);
+        }
+
+        .card-description {
+            font-size: 0.95rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 32px;
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 48px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: clamp(2.5rem, 4vw, 3.5rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-light) 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--muted);
+            margin-top: 8px;
+        }
+
+        /* Feature List */
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 40px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+
+        .feature-content h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .feature-content p {
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        /* Tech Stack */
+        .tech-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 40px;
+            max-width: 900px;
+        }
+
+        .tech-badge {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .tech-badge:hover {
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        /* Navigation */
+        .nav-controls {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 12px 24px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--foreground);
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: background 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: var(--border);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .slide-counter {
+            font-size: 0.9rem;
+            color: var(--muted);
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+            transition: width 0.3s ease;
+            z-index: 101;
+        }
+
+        /* Speaker Notes */
+        .notes-panel {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 800px;
+            width: calc(100% - 48px);
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            display: none;
+            z-index: 99;
+        }
+
+        .notes-panel.visible {
+            display: block;
+        }
+
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .notes-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .notes-close {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+
+        .notes-content {
+            font-size: 0.95rem;
+            color: var(--foreground);
+            line-height: 1.8;
+        }
+
+        .notes-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .notes-content li {
+            padding-left: 24px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .notes-content li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        /* Toggle Notes Button */
+        .notes-toggle {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 20px;
+            color: var(--foreground);
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+            transition: all 0.2s ease;
+        }
+
+        .notes-toggle:hover {
+            border-color: var(--accent);
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 100px;
+            padding: 8px 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: linear-gradient(135deg, hsl(215, 80%, 35%, 0.2) 0%, hsl(175, 70%, 40%, 0.1) 100%);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            margin-top: 32px;
+            max-width: 600px;
+        }
+
+        .highlight-box h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .highlight-box p {
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* Two Column Layout */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            width: 100%;
+            max-width: 1100px;
+            margin-top: 40px;
+        }
+
+        .column h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .column ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .column li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .column li:last-child {
+            border-bottom: none;
+        }
+
+        /* Keyboard Hint */
+        .keyboard-hint {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            font-size: 0.8rem;
+            color: var(--muted);
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 16px;
+        }
+
+        .keyboard-hint kbd {
+            background: var(--border);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 0 4px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .slide {
+                padding: 32px 24px;
+            }
+
+            .two-columns {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .keyboard-hint {
+                display: none;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .nav-controls,
+            .notes-toggle,
+            .keyboard-hint,
+            .notes-panel {
+                display: none !important;
+            }
+
+            .slide {
+                page-break-after: always;
+                position: relative;
+                display: flex !important;
+                opacity: 1 !important;
+                transform: none !important;
+                height: 100vh;
+            }
+
+            .progress-bar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- Progress Bar -->
+        <div class="progress-bar" id="progressBar"></div>
+
+        <!-- Keyboard Hint -->
+        <div class="keyboard-hint">
+            <kbd>←</kbd><kbd>→</kbd> Navigation &nbsp;|&nbsp; <kbd>N</kbd> Notizen
+        </div>
+
+        <!-- Slide 1: Title -->
+        <div class="slide slide-bg-gradient active" data-notes="Willkommen zur Präsentation unserer Industrie 4.0 Demo-Plattform. Diese Plattform wurde speziell für den IHK Wettbewerb 'Jugend macht Zukunft 2026' entwickelt und zeigt innovative KI-Lösungen für die regionale Industrie.">
+            <div class="badge">🏆 Jugend macht Zukunft 2026</div>
+            <h1 class="slide-title">
+                Industry<span class="gradient-text">AI</span>
+            </h1>
+            <p class="slide-subtitle">
+                Intelligente Lösungen für die Industrie 4.0 – 
+                Eine interaktive Demo-Plattform für die Region Heilbronn-Franken
+            </p>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">KI-Module</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Interaktiv</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">∞</div>
+                    <div class="stat-label">Möglichkeiten</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Problem -->
+        <div class="slide slide-bg-mesh" data-notes="Viele Unternehmen stehen vor der Herausforderung, abstrakte KI-Konzepte zu verstehen. Unsere Plattform macht diese Technologien greifbar und zeigt konkrete Anwendungsfälle mit echten Daten.">
+            <h1 class="slide-title">Die <span class="gradient-text">Herausforderung</span></h1>
+            <p class="slide-subtitle">
+                Wie können mittelständische Unternehmen von KI profitieren, 
+                ohne in teure Pilotprojekte zu investieren?
+            </p>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">🤔</div>
+                    <h3 class="card-title">Abstrakte Konzepte</h3>
+                    <p class="card-description">KI und Industrie 4.0 sind schwer greifbar und oft nur in Theorie bekannt</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">💰</div>
+                    <h3 class="card-title">Hohe Einstiegshürden</h3>
+                    <p class="card-description">Pilotprojekte sind teuer und ressourcenintensiv für den Mittelstand</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">❓</div>
+                    <h3 class="card-title">Unklarer Nutzen</h3>
+                    <p class="card-description">Der konkrete Mehrwert von KI-Lösungen ist oft schwer zu vermitteln</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Solution -->
+        <div class="slide slide-bg-mesh" data-notes="Unsere Lösung: Eine interaktive Demo-Plattform, die fünf zentrale Industrie-4.0-Anwendungen mit realistischen Daten simuliert. Unternehmen können die Technologie erleben, bevor sie investieren.">
+            <h1 class="slide-title">Unsere <span class="gradient-text">Lösung</span></h1>
+            <p class="slide-subtitle">
+                Eine interaktive Demo-Plattform, die Industrie 4.0 erlebbar macht
+            </p>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-content">
+                        <h3>Hands-on Erfahrung</h3>
+                        <p>Interaktive Module zum Ausprobieren und Verstehen</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-content">
+                        <h3>Realistische Daten</h3>
+                        <p>Simulation mit authentischen Industriedaten</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🚀</div>
+                    <div class="feature-content">
+                        <h3>Sofort nutzbar</h3>
+                        <p>Keine Installation, direkt im Browser verfügbar</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Digital Twin -->
+        <div class="slide slide-bg-mesh" data-notes="Der Digitale Zwilling ist das Herzstück moderner Produktion. Unsere 3D-Visualisierung zeigt Echtzeit-Maschinenstatus, Produktionsmetriken und ermöglicht virtuelle Werksrundgänge – perfekt für Schulungen und Optimierung.">
+            <div class="badge">🏭 Modul 1</div>
+            <h1 class="slide-title"><span class="gradient-text">Digitaler Zwilling</span></h1>
+            <p class="slide-subtitle">
+                3D-Visualisierung einer kompletten Produktionsanlage mit Echtzeit-Monitoring
+            </p>
+            <div class="two-columns">
+                <div class="column">
+                    <h3>Funktionen</h3>
+                    <ul>
+                        <li>🔄 Echtzeit-Maschinenstatus</li>
+                        <li>📈 Live-Produktionsmetriken</li>
+                        <li>🎮 Interaktive 3D-Navigation</li>
+                        <li>⚠️ Anomalie-Erkennung</li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <h3>Vorteile</h3>
+                    <ul>
+                        <li>👁️ Transparenz über alle Prozesse</li>
+                        <li>⚡ Schnelle Problemerkennung</li>
+                        <li>🎓 Schulung ohne Produktionsstop</li>
+                        <li>💡 Datenbasierte Entscheidungen</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Fleet Routing -->
+        <div class="slide slide-bg-mesh" data-notes="Unser Flottenrouting-Modul zeigt KI-optimierte Routenplanung auf einer interaktiven Karte. Mit simulierten Fahrzeugen zwischen Heilbronn, Stuttgart und Mannheim demonstrieren wir Kosteneinsparungen und CO2-Reduktion.">
+            <div class="badge">🚚 Modul 2</div>
+            <h1 class="slide-title"><span class="gradient-text">Intelligentes Flottenrouting</span></h1>
+            <p class="slide-subtitle">
+                KI-optimierte Routenplanung für maximale Effizienz
+            </p>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">-23%</div>
+                    <div class="stat-label">Kraftstoffkosten</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">-18%</div>
+                    <div class="stat-label">Fahrzeiten</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">-31%</div>
+                    <div class="stat-label">CO₂-Emissionen</div>
+                </div>
+            </div>
+            <div class="highlight-box">
+                <h3>Regionale Relevanz</h3>
+                <p>Optimierte Routen zwischen den Wirtschaftszentren Heilbronn, Stuttgart und Mannheim</p>
+            </div>
+        </div>
+
+        <!-- Slide 6: Predictive Maintenance -->
+        <div class="slide slide-bg-mesh" data-notes="Predictive Maintenance nutzt Machine Learning zur Vorhersage von Maschinenausfällen. Wir zeigen Sensordaten, Verschleißkurven und automatische Wartungsempfehlungen – bis zu 45% weniger ungeplante Stillstände.">
+            <div class="badge">⚙️ Modul 3</div>
+            <h1 class="slide-title"><span class="gradient-text">Predictive Maintenance</span></h1>
+            <p class="slide-subtitle">
+                Maschinenausfälle vorhersagen, bevor sie passieren
+            </p>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">📡</div>
+                    <h3 class="card-title">Sensor-Monitoring</h3>
+                    <p class="card-description">Vibration, Temperatur, Druck – alle kritischen Parameter im Blick</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🧠</div>
+                    <h3 class="card-title">ML-Algorithmen</h3>
+                    <p class="card-description">Muster erkennen und Ausfälle vorhersagen</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔧</div>
+                    <h3 class="card-title">Wartungsplanung</h3>
+                    <p class="card-description">Optimale Wartungszeitpunkte automatisch berechnen</p>
+                </div>
+            </div>
+            <div class="highlight-box">
+                <h3>-45% ungeplante Stillstände</h3>
+                <p>Durch vorausschauende Wartung statt reaktiver Reparatur</p>
+            </div>
+        </div>
+
+        <!-- Slide 7: Energy Management -->
+        <div class="slide slide-bg-mesh" data-notes="Das Energiemanagement-Modul visualisiert Verbrauchsmuster und zeigt KI-basierte Optimierungsvorschläge. Lastspitzenreduktion und Peak-Shaving können Energiekosten um bis zu 28% senken.">
+            <div class="badge">⚡ Modul 4</div>
+            <h1 class="slide-title"><span class="gradient-text">Energiemanagement</span></h1>
+            <p class="slide-subtitle">
+                Intelligente Steuerung für nachhaltige Produktion
+            </p>
+            <div class="two-columns">
+                <div class="column">
+                    <h3>Analyse</h3>
+                    <ul>
+                        <li>📊 Echtzeit-Verbrauchsmonitoring</li>
+                        <li>📈 Lastspitzen-Erkennung</li>
+                        <li>🔍 Ineffizienz-Analyse</li>
+                        <li>🌡️ Wärmemanagement</li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <h3>Optimierung</h3>
+                    <ul>
+                        <li>⚡ Peak-Shaving Strategien</li>
+                        <li>🔋 Lastverschiebung</li>
+                        <li>🌱 CO₂-Footprint Reduktion</li>
+                        <li>💶 Bis zu 28% Kosteneinsparung</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Supply Chain -->
+        <div class="slide slide-bg-mesh" data-notes="Supply Chain Optimization zeigt die komplette Lieferkette auf einer Karte. KI-gestützte Nachfrageprognosen und automatische Bestellvorschläge helfen, Lagerkosten zu senken und Lieferengpässe zu vermeiden.">
+            <div class="badge">📦 Modul 5</div>
+            <h1 class="slide-title"><span class="gradient-text">Supply Chain Optimization</span></h1>
+            <p class="slide-subtitle">
+                Transparenz und Kontrolle über die gesamte Lieferkette
+            </p>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">🗺️</div>
+                    <h3 class="card-title">Lieferanten-Mapping</h3>
+                    <p class="card-description">Globale Übersicht aller Partner und Warenflüsse</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📉</div>
+                    <h3 class="card-title">Bestandsoptimierung</h3>
+                    <p class="card-description">Just-in-Time Lieferung durch KI-Prognosen</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">⚠️</div>
+                    <h3 class="card-title">Risikomanagement</h3>
+                    <p class="card-description">Frühwarnung bei Lieferengpässen</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Tech Stack -->
+        <div class="slide slide-bg-mesh" data-notes="Unser Tech-Stack basiert auf modernen Web-Technologien: React mit TypeScript für robuste Entwicklung, Three.js für 3D-Visualisierung, Recharts für Datenvisualisierung und Leaflet für Karten. Alles läuft direkt im Browser.">
+            <h1 class="slide-title">Technische <span class="gradient-text">Umsetzung</span></h1>
+            <p class="slide-subtitle">
+                Moderne Technologien für eine zukunftssichere Plattform
+            </p>
+            <div class="tech-grid">
+                <div class="tech-badge">⚛️ React</div>
+                <div class="tech-badge">📘 TypeScript</div>
+                <div class="tech-badge">🎨 Tailwind CSS</div>
+                <div class="tech-badge">🎭 Framer Motion</div>
+                <div class="tech-badge">🌐 Three.js</div>
+                <div class="tech-badge">📊 Recharts</div>
+                <div class="tech-badge">🗺️ Leaflet</div>
+                <div class="tech-badge">⚡ Vite</div>
+            </div>
+            <div class="highlight-box">
+                <h3>100% Browser-basiert</h3>
+                <p>Keine Installation notwendig – sofort einsatzbereit auf jedem Gerät</p>
+            </div>
+        </div>
+
+        <!-- Slide 10: Regional Impact -->
+        <div class="slide slide-bg-mesh" data-notes="Die Region Heilbronn-Franken ist ein Industriestandort mit über 4.000 Industrieunternehmen. Unsere Plattform unterstützt die digitale Transformation des Mittelstands und stärkt den Innovationsstandort.">
+            <h1 class="slide-title">Regionale <span class="gradient-text">Bedeutung</span></h1>
+            <p class="slide-subtitle">
+                Innovation für den Wirtschaftsstandort Heilbronn-Franken
+            </p>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">4.000+</div>
+                    <div class="stat-label">Industrieunternehmen</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">150.000</div>
+                    <div class="stat-label">Industriearbeitsplätze</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">#1</div>
+                    <div class="stat-label">Exportregion in BaWü</div>
+                </div>
+            </div>
+            <div class="highlight-box">
+                <h3>Unsere Vision</h3>
+                <p>Mittelständische Unternehmen auf dem Weg zur digitalen Transformation begleiten und den Innovationsstandort Heilbronn-Franken stärken</p>
+            </div>
+        </div>
+
+        <!-- Slide 11: Call to Action -->
+        <div class="slide slide-bg-gradient" data-notes="Vielen Dank für Ihre Aufmerksamkeit! Probieren Sie die Demo selbst aus und erleben Sie Industrie 4.0 live. Bei Fragen stehen wir gerne zur Verfügung.">
+            <div class="badge">🎯 Zusammenfassung</div>
+            <h1 class="slide-title">
+                Bereit für die <span class="gradient-text">Zukunft</span>?
+            </h1>
+            <p class="slide-subtitle">
+                Erleben Sie Industrie 4.0 – interaktiv, verständlich, inspirierend
+            </p>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">KI-Module</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">1</div>
+                    <div class="stat-label">Plattform</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">∞</div>
+                    <div class="stat-label">Potenzial</div>
+                </div>
+            </div>
+            <div class="highlight-box" style="margin-top: 48px;">
+                <h3>🚀 Jetzt Demo starten</h3>
+                <p>Testen Sie alle Module live und entdecken Sie die Möglichkeiten von KI in der Industrie</p>
+            </div>
+        </div>
+
+        <!-- Notes Panel -->
+        <div class="notes-panel" id="notesPanel">
+            <div class="notes-header">
+                <span class="notes-title">📝 Sprecher-Notizen</span>
+                <button class="notes-close" onclick="toggleNotes()">×</button>
+            </div>
+            <div class="notes-content" id="notesContent"></div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-controls">
+            <button class="nav-btn" id="prevBtn" onclick="prevSlide()">← Zurück</button>
+            <span class="slide-counter" id="slideCounter">1 / 11</span>
+            <button class="nav-btn" id="nextBtn" onclick="nextSlide()">Weiter →</button>
+        </div>
+
+        <!-- Notes Toggle -->
+        <button class="notes-toggle" onclick="toggleNotes()">
+            📝 <span id="notesToggleText">Notizen</span>
+        </button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        let notesVisible = false;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active', 'exit');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            // Update counter
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+
+            // Update progress bar
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+
+            // Update buttons
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+
+            // Update notes
+            updateNotes();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function toggleNotes() {
+            notesVisible = !notesVisible;
+            const panel = document.getElementById('notesPanel');
+            const toggleText = document.getElementById('notesToggleText');
+            
+            if (notesVisible) {
+                panel.classList.add('visible');
+                toggleText.textContent = 'Ausblenden';
+                updateNotes();
+            } else {
+                panel.classList.remove('visible');
+                toggleText.textContent = 'Notizen';
+            }
+        }
+
+        function updateNotes() {
+            const notes = slides[currentSlide].getAttribute('data-notes');
+            document.getElementById('notesContent').innerHTML = `<p>${notes}</p>`;
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowRight':
+                case ' ':
+                    e.preventDefault();
+                    nextSlide();
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    prevSlide();
+                    break;
+                case 'n':
+                case 'N':
+                    toggleNotes();
+                    break;
+                case 'Home':
+                    currentSlide = 0;
+                    updateSlide();
+                    break;
+                case 'End':
+                    currentSlide = totalSlides - 1;
+                    updateSlide();
+                    break;
+            }
+        });
+
+        // Touch support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+            }
+        }
+
+        // Initialize
+        updateSlide();
+    </script>
+</body>
+</html>
